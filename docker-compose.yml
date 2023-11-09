@@ -1,0 +1,42 @@
+version: '3.7'
+
+services:
+  endpoints:
+    build:
+      context: ./flask-app
+    container_name: endpoint 
+    restart: on-failure
+    ports:
+      - 5001:5001
+    networks:
+      net-challenge:
+        ipv4_address: 172.21.0.10
+    depends_on:
+      db-mongo:
+        condition: service_started
+    volumes:
+      - ./flask-app:/app
+
+  db-mongo:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      net-challenge:
+        ipv4_address: 172.21.0.18
+    volumes:
+      - mongodb-data:/data/db
+
+volumes:
+  mongodb-data:
+
+networks:
+  net-challenge:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
+          ip_range: 172.21.0.0/24
+          gateway: 172.21.0.1
+
