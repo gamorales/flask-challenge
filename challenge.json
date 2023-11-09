@@ -1,0 +1,74 @@
+{
+	"info": {
+		"_postman_id": "b1bea6db-fe65-478a-8906-30d567e4d59d",
+		"name": "Flask",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Upload",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/Users/gamorales/Downloads/netflix.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5001/upload",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Query",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"field\": \"release_year\",\n    \"value\": 1971\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.01:5001/query",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"01"
+					],
+					"port": "5001",
+					"path": [
+						"query"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
