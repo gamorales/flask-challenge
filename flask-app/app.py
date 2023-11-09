@@ -1,6 +1,5 @@
 import os
 from typing import List, Dict
-import json
 
 import pandas as pd
 from pymongo import MongoClient
@@ -16,7 +15,7 @@ from flask import (
 
 
 app = Flask(__name__)
-app.secret_key = 'lerolero'
+app.secret_key = "lerolero"
 
 
 def parse_csv(file_path: str) -> List[Dict]:
@@ -30,9 +29,9 @@ def parse_csv(file_path: str) -> List[Dict]:
         list: A list of dictionaries representing the data from the CSV file.
     """
     data = []
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         df = pd.read_csv(file)
-        data = df.to_dict(orient='records')
+        data = df.to_dict(orient="records")
     return data
 
 
@@ -43,8 +42,8 @@ def connect_mongodb() -> MongoClient:
     Returns:
         MongoClient: The MongoDB client instance.
     """
-    client = MongoClient('mongodb://172.21.0.18:27017/')
-    db = client['netflix']
+    client = MongoClient("mongodb://172.21.0.18:27017/")
+    db = client["netflix"]
     return db
 
 
@@ -55,9 +54,8 @@ def store_in_mongodb(data: List[Dict]) -> None:
     Args:
         data (list): A list of dictionaries to be stored in MongoDB.
     """
-    #TODO: Chunk store can be made here, in case of failing, raising exceptions
     db = connect_mongodb()
-    collection = db['movies']
+    collection = db["movies"]
     collection.insert_many(data)
 
 
@@ -72,7 +70,7 @@ def upload_chunk(uploaded_file) -> str:
         str: The path to the uploaded file on the server.
     """
     file_name = uploaded_file.filename
-    file_path = os.path.join('uploads', file_name)
+    file_path = os.path.join("uploads", file_name)
     chunk_size = 4096
 
     with open(file_path, "wb") as file:
@@ -85,34 +83,34 @@ def upload_chunk(uploaded_file) -> str:
     return file_path
 
 
-@app.route('/upload', methods=['POST'])
+@app.route("/upload", methods=["POST"])
 def upload_file():
-    uploaded_file = request.files['file']
+    uploaded_file = request.files["file"]
 
-    if uploaded_file.filename != '':
+    if uploaded_file.filename != "":
         file_path = upload_chunk(uploaded_file)
-        #uploaded_file.save('uploads/' + uploaded_file.filename)
+        # uploaded_file.save('uploads/' + uploaded_file.filename)
 
         data = parse_csv(file_path)
         store_in_mongodb(data)
 
-        return 'File uploaded and data stored successfully in MongoDB'
+        return "File uploaded and data stored successfully in MongoDB"
     else:
         flash("Please select a file", "error")
         return redirect(url_for("index"))
 
 
-@app.route('/query', methods=['POST'])
+@app.route("/query", methods=["POST"])
 def query_mongodb():
     """
     Query MongoDB for movie records based on specified criteria.
 
     Request Format:
         {
-            "field": "field_name",       # Field to query (e.g., "title")
-            "value": "search_value",     # Value to search for
-            "page": 1,                   # Page number (default is 1)
-            "quantity": 10               # Number of results per page (default is 10)
+            "field": "field_name",   # Field to query (e.g., "title")
+            "value": "search_value", # Value to search for
+            "page": 1,               # Page number (default is 1)
+            "quantity": 10           # Number of results per page (default 10)
         }
 
     Returns:
@@ -124,27 +122,29 @@ def query_mongodb():
     """
     try:
         data = request.get_json()
-        field = data.get('field')
-        value = data.get('value')
-        page = int(data.get('page', 1))
-        quantity = int(data.get('quantity', 10))
+        field = data.get("field")
+        value = data.get("value")
+        page = int(data.get("page", 1))
+        quantity = int(data.get("quantity", 10))
     except (KeyError, ValueError):
         return jsonify({"error": "Invalid JSON data in the request body"})
 
     db = connect_mongodb()
-    collection = db['movies']
+    collection = db["movies"]
 
     query = {}
     if field and value:
         query[field] = {"$regex": f".*{value}.*", "$options": "i"}
 
     skip = (page - 1) * quantity
-    result = list(collection.find(query, {"_id": 0}).skip(skip).limit(quantity))
+    result = list(
+        collection.find(query, {"_id": 0}).skip(skip).limit(quantity)
+    )
 
     return jsonify(result)
 
 
-@app.route('/', methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def index():
     error = None
     if request.method == "POST":
