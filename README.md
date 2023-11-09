@@ -13,6 +13,7 @@ A simple Flask web application for handling file uploads, querying a MongoDB dat
 - [Installation](#installation)
 - [Usage](#usage)
 - [Endpoints](#endpoints)
+- [Client Script](#client)
 
 ## Features
 
@@ -67,3 +68,21 @@ Before you begin, ensure you have met the following requirements:
         "quantity": 10            // Number of results per page (default 10)
     }
     ```
+## Client Script
+1. Create a virtual environment:
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+2. Install the required Python packages:
+    ```bash
+    pip3 install requests
+    ```
+
+3. Run the client script:
+    ```bash
+    python flask-app/client.py
+    ```
+
+
