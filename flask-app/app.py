@@ -129,6 +129,9 @@ def query_mongodb():
     except (KeyError, ValueError):
         return jsonify({"error": "Invalid JSON data in the request body"})
 
+    if page <= 0 or quantity <= 0:
+        return jsonify({"error": "Page and quantity must be positive."})
+
     db = connect_mongodb()
     collection = db["movies"]
 
@@ -140,6 +143,9 @@ def query_mongodb():
     result = list(
         collection.find(query, {"_id": 0}).skip(skip).limit(quantity)
     )
+
+    if not result:
+        return jsonify({"error": "There's not records according to this query"}), 404
 
     return jsonify(result)
 
